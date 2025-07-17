@@ -2,10 +2,13 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { abi as NFT_CONTRACT_ABI } from '@/constants/abi';
-import { ethers } from 'ethers';
+// import { ethers } from 'ethers';
 import { useLoading } from '@/components/loading-provider';
 import { toast } from 'sonner';
 import useAddress from '@/hooks/useAddress';
+import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core';
+import { config } from '@/contexts/wagmiConfig';
+import { parseEther } from 'viem';
 
 export interface NFT {
   tokenId: string;
@@ -32,7 +35,7 @@ interface ContractContextType {
   purchaseNFT: (nft: NFT) => void;
 }
 
-const NFT_CONRACT_ADDR = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as string;
+const NFT_CONRACT_ADDR = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 
 const ContractContext = createContext<ContractContextType | undefined>(undefined);
 
@@ -43,13 +46,15 @@ export function ContractProvider({ children }: { children: ReactNode }) {
   const address = useAddress();
 
   const getAllNFTs = async () => {
-    const provider = new ethers.BrowserProvider(window.ethereum);
+    let allNftRes = await readContract(config, {
+      abi: NFT_CONTRACT_ABI,
+      address: NFT_CONRACT_ADDR,
+      functionName: 'getAllNFTs',
+      args: []
+    });
 
-    const nftMarket = new ethers.Contract(NFT_CONRACT_ADDR, NFT_CONTRACT_ABI, provider);
-
-    let allNftRes = await nftMarket.getAllNFTs();
     allNftRes = allNftRes.map((nft) => {
-      const [tokenId, owner, seller, price, currentlyListed] = nft;
+      const {tokenId, owner, seller, price, currentlyListed} = nft;
       return {
         tokenId,
         owner,
@@ -60,7 +65,12 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     });
 
     const nftTokenUriRes = await Promise.all(allNftRes.map(nft => {
-      return nftMarket.tokenURI(nft.tokenId);
+      return readContract(config, {
+        abi: NFT_CONTRACT_ABI,
+        address: NFT_CONRACT_ADDR,
+        functionName: 'tokenURI',
+        args: [nft.tokenId]
+      });
     }));
 
     await Promise.all(nftTokenUriRes.map((uri, index) => {
@@ -77,14 +87,15 @@ export function ContractProvider({ children }: { children: ReactNode }) {
   }
 
   const getMyNFTs = async () => {
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    // console.log(window.ethereum, '< window.ethereum');
-    const nftMarket = new ethers.Contract(NFT_CONRACT_ADDR, NFT_CONTRACT_ABI, signer);
+    let myNftRes = await readContract(config, {
+      abi: NFT_CONTRACT_ABI,
+      address: NFT_CONRACT_ADDR,
+      functionName: 'getAllNFTs',
+      args: []
+    });
 
-    let myNftRes = await nftMarket.getMyNFTs();
     myNftRes = myNftRes.map((nft) => {
-      const [tokenId, owner, seller, price, currentlyListed] = nft;
+      const {tokenId, owner, seller, price, currentlyListed} = nft;
       return {
         tokenId,
         owner,
@@ -95,7 +106,13 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     });
 
     const nftTokenUriRes = await Promise.all(myNftRes.map(nft => {
-      return nftMarket.tokenURI(nft.tokenId);
+      // return nftMarket.tokenURI(nft.tokenId);
+      return readContract(config, {
+        abi: NFT_CONTRACT_ABI,
+        address: NFT_CONRACT_ADDR,
+        functionName: 'tokenURI',
+        args: [nft.tokenId]
+      });
     }));
 
     await Promise.all(nftTokenUriRes.map((uri, index) => {
@@ -119,13 +136,19 @@ export function ContractProvider({ children }: { children: ReactNode }) {
   }, [address]);
 
   const mintNFT = async (data: MintData) => {
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    const nftMarket = new ethers.Contract(NFT_CONRACT_ADDR, NFT_CONTRACT_ABI, signer);
+    // const provider = new ethers.BrowserProvider(window.ethereum);
+    // const signer = await provider.getSigner();
+    // const nftMarket = new ethers.Contract(NFT_CONRACT_ADDR, NFT_CONTRACT_ABI, signer);
 
-    const listPrice = await nftMarket.getListPrice();
-    const price = ethers.parseEther(data.price);
-
+    // const listPrice = await nftMarket.getListPrice();
+    const listPrice = await readContract(config, {
+      abi: NFT_CONTRACT_ABI,
+      address: NFT_CONRACT_ADDR,
+      functionName: 'getListPrice',
+      args: [],
+    });
+    const price = parseEther(data.price);
+    debugger;
     const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
       method: 'POST',
       headers: {
@@ -140,11 +163,24 @@ export function ContractProvider({ children }: { children: ReactNode }) {
       }),
     }).then(r => r.json())
 
-    const tx = await nftMarket.createToken(response.IpfsHash, price, {
-      value: listPrice
+    // const tx = await nftMarket.createToken(response.IpfsHash, price, {
+    //   value: listPrice
+    // });
+    
+    const txHash = await writeContract(config, {
+      abi: NFT_CONTRACT_ABI,
+      address: NFT_CONRACT_ADDR,
+      functionName: 'createToken',
+      args: [response.IpfsHash, price],
+      value: listPrice,
     });
-
-    await tx.wait();
+    debugger;
+    const receipt = await waitForTransactionReceipt(config, {
+      hash: txHash,
+    })
+    debugger;
+    console.log({ receipt });
+    // await tx.wait();
     toast.success('NFT minted successfully');
     getMyNFTs();
     getAllNFTs();
@@ -152,19 +188,32 @@ export function ContractProvider({ children }: { children: ReactNode }) {
 
   const purchaseNFT = async (nft: NFT) => {
     showLoading();
-    console.log(ethers.parseEther(nft.price));
     debugger;
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const nftMarket = new ethers.Contract(NFT_CONRACT_ADDR, NFT_CONTRACT_ABI, signer);
+      // const provider = new ethers.BrowserProvider(window.ethereum);
+      // const signer = await provider.getSigner();
+      // const nftMarket = new ethers.Contract(NFT_CONRACT_ADDR, NFT_CONTRACT_ABI, signer);
 
-      const tx = await nftMarket.executeSale(nft.tokenId, {
-        value: ethers.parseEther(nft.price)
+      // const tx = await nftMarket.executeSale(nft.tokenId, {
+      //   value: ethers.parseEther(nft.price)
+      // });
+
+      // await tx.wait();
+
+      const txHash = await writeContract(config, {
+        abi: NFT_CONTRACT_ABI,
+        address: NFT_CONRACT_ADDR,
+        functionName: 'executeSale',
+        args: [nft.tokenId],
+        value: parseEther(nft.price),
       });
 
-      await tx.wait();
+      const receipt = await waitForTransactionReceipt(config, {
+        hash: txHash,
+      });
+      console.log({ receipt });
+
       toast.success('Successfully purchased NFT!');
 
       getMyNFTs();

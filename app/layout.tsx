@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { WagmiProvider } from 'wagmi';
 import { config } from '@/contexts/wagmiConfig';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-
+import SwitchToValidChain from '@/components/SwitchToValidChain';
 
 const queryClient = new QueryClient()
 
@@ -40,7 +40,9 @@ export default function RootLayout({
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>
             <LoadingProvider>
-              <ContractProvider>    
+              <ContractProvider>
+                {/* 如果是不支持的链，需要引导用户切换到支持的链 */}
+                <SwitchToValidChain />
                 <div className="min-h-screen bg-background">
                   <Navbar />
                   <main>{children}</main>

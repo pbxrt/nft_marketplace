@@ -1,9 +1,24 @@
 import { http, createConfig } from 'wagmi'
 import {
   sepolia,
-  localhost
 } from 'wagmi/chains'
+import { defineChain } from 'viem';
 import { walletConnect } from 'wagmi/connectors';
+
+export const hardhat = defineChain({
+  id: 31337,
+  name: 'Hardhat',
+  nativeCurrency: {
+    name: 'GO',
+    symbol: 'GO',
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: {
+      http: ['http://127.0.0.1:8545'],
+    },
+  },
+});
 
 const isProd = process.env.NEXT_PUBLIC_ENV === 'prod';
 
@@ -18,9 +33,9 @@ export const config = isProd ? createConfig({
     })
   ]
 }) : createConfig({
-  chains: [localhost],
+  chains: [hardhat],
   transports: {
-    [localhost.id]: http(),
+    [hardhat.id]: http(),
   },
   connectors: [
     walletConnect({

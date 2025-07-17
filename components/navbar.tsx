@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Wallet as WalletIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import useAddress from '@/hooks/useAddress';
+import useAddress, { useChain } from '@/hooks/useAddress';
 import { useState, useEffect } from 'react';
 import {
   DropdownMenu,
@@ -25,6 +25,7 @@ export function Navbar() {
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect()
   const address = useAddress();
+  const chainId = useChain();
   console.log('address =>', address);
 
   const [open, setOpen] = useState(false);
@@ -90,6 +91,9 @@ export function Navbar() {
                     <DropdownMenuItem onClick={onDisconnect}>
                       Disconnect
                     </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      ChainId: {chainId}
+                    </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -110,7 +114,7 @@ export function Navbar() {
           </DialogHeader>
           <div>
             {(connectors || []).map(connector => (
-              <div key={connector.id} onClick={() => connect({ connector })}>{connector.name}</div>
+              <div key={connector.id} onClick={() => connect({ connector, chainId })}>{connector.name}</div>
             ))}
           </div>
         </DialogContent>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 export default function useAddress() {
   const [isClient, setIsClient] = useState(false);
@@ -10,4 +10,15 @@ export default function useAddress() {
   }, []);
 
   return isClient ? address : undefined;
+}
+
+export function useChain() {
+  const [isClient, setIsClient] = useState(false);
+  const chainId = useChainId();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  return isClient ? chainId : undefined;
 }
