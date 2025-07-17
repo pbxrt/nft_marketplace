@@ -22,6 +22,8 @@ export const hardhat = defineChain({
 
 const isProd = process.env.NEXT_PUBLIC_ENV === 'prod';
 
+export const currentChain = isProd ? sepolia : hardhat;
+
 export const config = isProd ? createConfig({
   chains: [sepolia],
   transports: {

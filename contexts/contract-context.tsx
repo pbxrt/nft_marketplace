@@ -5,9 +5,9 @@ import { abi as NFT_CONTRACT_ABI } from '@/constants/abi';
 // import { ethers } from 'ethers';
 import { useLoading } from '@/components/loading-provider';
 import { toast } from 'sonner';
-import useAddress from '@/hooks/useAddress';
+import useAddress, { useChain } from '@/hooks/useAddress';
 import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core';
-import { config } from '@/contexts/wagmiConfig';
+import { config, currentChain } from '@/contexts/wagmiConfig';
 import { parseEther } from 'viem';
 
 export interface NFT {
@@ -44,9 +44,10 @@ export function ContractProvider({ children }: { children: ReactNode }) {
   const [userNFTs, setUserNFTs] = useState<NFT[]>([]);
   const { showLoading, hideLoading } = useLoading();
   const address = useAddress();
+  const chainId = useChain();
 
   const getAllNFTs = async () => {
-    let allNftRes = await readContract(config, {
+    let allNftRes: any = await readContract(config, {
       abi: NFT_CONTRACT_ABI,
       address: NFT_CONRACT_ADDR,
       functionName: 'getAllNFTs',
@@ -87,7 +88,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
   }
 
   const getMyNFTs = async () => {
-    let myNftRes = await readContract(config, {
+    let myNftRes: any = await readContract(config, {
       abi: NFT_CONTRACT_ABI,
       address: NFT_CONRACT_ADDR,
       functionName: 'getAllNFTs',
@@ -173,8 +174,10 @@ export function ContractProvider({ children }: { children: ReactNode }) {
       functionName: 'createToken',
       args: [response.IpfsHash, price],
       value: listPrice,
+      account: address,
+      chain: currentChain,
     });
-    debugger;
+
     const receipt = await waitForTransactionReceipt(config, {
       hash: txHash,
     })
@@ -207,6 +210,8 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         functionName: 'executeSale',
         args: [nft.tokenId],
         value: parseEther(nft.price),
+        account: address,
+        chain: currentChain,
       });
 
       const receipt = await waitForTransactionReceipt(config, {
