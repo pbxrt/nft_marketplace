@@ -91,8 +91,8 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     let myNftRes: any = await readContract(config, {
       abi: NFT_CONTRACT_ABI,
       address: NFT_CONRACT_ADDR,
-      functionName: 'getAllNFTs',
-      args: []
+      functionName: 'getMyNFTs',
+      args: [address]
     });
 
     myNftRes = myNftRes.map((nft) => {
