@@ -7,7 +7,7 @@ import { useLoading } from '@/components/loading-provider';
 import { toast } from 'sonner';
 import useAddress from '@/hooks/useAddress';
 
-interface NFT {
+export interface NFT {
   tokenId: string;
   name: string;
   number: string;
@@ -22,7 +22,7 @@ interface MintData {
   name: string;
   number: string;
   price: string;
-  image: File | null;
+  image: File | string;
 }
 
 interface ContractContextType {
@@ -32,7 +32,7 @@ interface ContractContextType {
   purchaseNFT: (nft: NFT) => void;
 }
 
-const NFT_CONRACT_ADDR = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+const NFT_CONRACT_ADDR = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as string;
 
 const ContractContext = createContext<ContractContextType | undefined>(undefined);
 
@@ -126,7 +126,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     const listPrice = await nftMarket.getListPrice();
     const price = ethers.parseEther(data.price);
 
-    let response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
+    const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -138,8 +138,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         price: data.price,
         image: data.image,
       }),
-    });
-    response = await response.json();
+    }).then(r => r.json())
 
     const tx = await nftMarket.createToken(response.IpfsHash, price, {
       value: listPrice

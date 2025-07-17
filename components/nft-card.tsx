@@ -6,18 +6,8 @@ import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useContract } from '@/contexts/contract-context';
+import { useContract, type NFT } from '@/contexts/contract-context';
 import useAddress from '@/hooks/useAddress';
-
-interface NFT {
-  tokenId: string;
-  name: string;
-  number: string;
-  price: string;
-  image: string;
-  owner?: string;
-  seller: string;
-}
 
 interface NFTCardProps {
   nft: NFT;
@@ -46,7 +36,7 @@ export function NFTCard({ nft, showPurchaseButton }: NFTCardProps) {
     >
       <div className="relative aspect-square">
         <Image src={nft.image || '/placeholder.svg'} alt={nft.name} fill className="object-cover" />
-        {showPurchaseButton && isHovered && (address?.toLowerCase() !== nft.seller.toLowerCase()) && (
+        {showPurchaseButton && isHovered && (address?.toLowerCase() !== nft.seller?.toLowerCase()) && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center transition-all duration-300">
             <Button className="flex items-center space-x-2 cursor-pointer" size="sm" onClick={handlePurchase}>
               <ShoppingCart className="w-4 h-4" />

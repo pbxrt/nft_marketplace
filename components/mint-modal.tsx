@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { Upload, X } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -26,18 +25,19 @@ export function MintModal({ open, onOpenChange }: MintModalProps) {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    if (!file) return;
 
     const fileData = new FormData();
     fileData.append("file", file);
 
-    let response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+    const response: {IpfsHash: string} = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`
       },
       body: fileData,
-    });
-    response = await response.json();
+    }).then(res => res.json());
+
 
     const fileUrl = `https://gateway.pinata.cloud/ipfs/${response.IpfsHash}`;
     setFormData((prev) => ({ ...prev, image: fileUrl }));
