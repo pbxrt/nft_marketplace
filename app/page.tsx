@@ -1,15 +1,9 @@
 'use client';
-import { useEffect } from 'react';
 import { useContract } from '@/contexts/contract-context';
 import { NFTCard } from '@/components/nft-card';
-import { config } from '@/contexts/wagmiConfig';
 
 export default function HomePage() {
   const { allNFTs } = useContract();
-
-  useEffect(() => {
-    console.log(config);
-  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">
