@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import SwitchToValidChain from '@/components/SwitchToValidChain';
 import {
   RainbowKitProvider,
+  darkTheme,
 } from '@rainbow-me/rainbowkit';
 const queryClient = new QueryClient()
 

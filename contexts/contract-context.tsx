@@ -130,8 +130,9 @@ export function ContractProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    getAllNFTs();
+
     if (address) {
-      getAllNFTs();
       getMyNFTs();
     }
   }, [address]);

@@ -85,10 +85,11 @@ export function Navbar() {
             {address ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="flex items-center space-x-2">
+                  {/* <Button variant="outline" className="flex items-center space-x-2">
                     <WalletIcon className="w-4 h-4" />
                     <span>{formatAddress(address)}</span>
-                  </Button>
+                  </Button> */}
+                  <ConnectButton label={'Connect Wallet'} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="start">
                   <DropdownMenuGroup>
@@ -102,28 +103,28 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button onClick={connectWallet} className="flex items-center space-x-2">
-                <WalletIcon className="w-4 h-4" />
-                <span>Connect Wallet</span>
-              </Button>
+              <ConnectButton label={'Connect Wallet'} />
+              // <Button onClick={connectWallet} className="flex items-center space-x-2">
+              //   <WalletIcon className="w-4 h-4" />
+              //   <span>Connect Wallet</span>
+              // </Button>
             )}
           </div>
         </div>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      {/* <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Connect to Wallet</DialogTitle>
           </DialogHeader>
           <div>
-            <ConnectButton label="Connect Wallet" />
-            {/* {(connectors || []).map(connector => (
+            {(connectors || []).map(connector => (
               <div key={connector.id} onClick={() => connect({ connector, chainId })}>{connector.name}</div>
-            ))} */}
+            ))}
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </nav>
   )
 }

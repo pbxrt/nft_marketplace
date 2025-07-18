@@ -15,7 +15,8 @@ const eslintConfig = [
     // 这里可以加 files 字段指定只对 ts/tsx 文件生效
     files: ["**/*.ts", "**/*.tsx"],
     rules: {
-      "@typescript-eslint/no-explicit-any": "off"
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "warning"
     }
   }
 ];
