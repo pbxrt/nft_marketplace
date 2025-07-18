@@ -1,9 +1,15 @@
-import { http, createConfig } from 'wagmi'
+import {
+  http,
+  // createConfig
+} from 'wagmi'
 import {
   sepolia,
 } from 'wagmi/chains'
 import { defineChain } from 'viem';
-import { walletConnect } from 'wagmi/connectors';
+// import { walletConnect } from 'wagmi/connectors';
+import {
+  getDefaultConfig,
+} from '@rainbow-me/rainbowkit';
 
 export const hardhat = defineChain({
   id: 31337,
@@ -24,25 +30,39 @@ const isProd = process.env.NEXT_PUBLIC_ENV === 'prod';
 
 export const currentChain = isProd ? sepolia : hardhat;
 
-export const config = isProd ? createConfig({
+// export const config = isProd ? createConfig({
+//   chains: [sepolia],
+//   transports: {
+//     [sepolia.id]: http(),
+//   },
+//   connectors: [
+//     walletConnect({
+//       projectId: '233ac368c45497f9220b43a293b10299'
+//     })
+//   ]
+// }) : createConfig({
+//   chains: [hardhat],
+//   transports: {
+//     [hardhat.id]: http(),
+//   },
+//   connectors: [
+//     walletConnect({
+//       projectId: '233ac368c45497f9220b43a293b10299'
+//     })
+//   ]
+// });
+
+export const config = isProd ? getDefaultConfig({
+  appName: 'NFT Marketplace',
+  projectId: '233ac368c45497f9220b43a293b10299',
   chains: [sepolia],
   transports: {
-    [sepolia.id]: http(),
+    [sepolia.id]: http('https://eth-sepolia.g.alchemy.com/v2/PypWHEhu6dQvkBxhvwKe_Aw-VM_Ejtjs')
   },
-  connectors: [
-    walletConnect({
-      projectId: '233ac368c45497f9220b43a293b10299'
-    })
-  ]
-}) : createConfig({
+  ssr: true
+}) : getDefaultConfig({
+  appName: 'NFT Marketplace',
+  projectId: '233ac368c45497f9220b43a293b10299',
   chains: [hardhat],
-  transports: {
-    [hardhat.id]: http(),
-  },
-  connectors: [
-    walletConnect({
-      projectId: '233ac368c45497f9220b43a293b10299'
-    })
-  ]
-});
-
+  ssr: true
+})

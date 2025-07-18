@@ -1,11 +1,15 @@
 'use client';
-import { useConnect, useDisconnect } from 'wagmi';
+import {
+  // useConnect,
+  useDisconnect
+} from 'wagmi';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Wallet as WalletIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import useAddress, { useChain } from '@/hooks/useAddress';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useState, useEffect } from 'react';
 import {
   DropdownMenu,
@@ -22,7 +26,7 @@ export function Navbar() {
     { name: 'Home', href: '/' },
     { name: 'My NFT', href: '/my-nfts' },
   ];
-  const { connect, connectors } = useConnect();
+  // const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect()
   const address = useAddress();
   const chainId = useChain();
@@ -113,9 +117,10 @@ export function Navbar() {
             <DialogTitle>Connect to Wallet</DialogTitle>
           </DialogHeader>
           <div>
-            {(connectors || []).map(connector => (
+            <ConnectButton label="Connect Wallet" />
+            {/* {(connectors || []).map(connector => (
               <div key={connector.id} onClick={() => connect({ connector, chainId })}>{connector.name}</div>
-            ))}
+            ))} */}
           </div>
         </DialogContent>
       </Dialog>

@@ -34,7 +34,7 @@ export default function SwitchToValidChain() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>hello</DialogTitle>
+          <DialogTitle>Unsupported Chain</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4">
           <div>Please switch to （ID: {chains[0]?.id} to proceed.</div>
