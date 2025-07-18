@@ -1,18 +1,30 @@
 import { useChainId, useSwitchChain } from 'wagmi';
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { watchAccount } from '@wagmi/core';
+import { config } from '@/contexts/wagmiConfig';
 
 export default function SwitchToValidChain() {
   const chainId = useChainId();
+  const [walletChainId, setWalletChainId] = useState(null);
   const { chains, switchChain } = useSwitchChain();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!chainId) return;
-    if (chains.every(chain => chain.id !== chainId)) {
-      setOpen(true);
+    watchAccount(config, {
+      onChange(data) {
+        if (data.chainId) {
+          setWalletChainId(data.chainId);
+        }
+      }
+    })
+  }, []);
+
+  useEffect(() => {
+    if (chainId && walletChainId) {
+      setOpen(chainId !== walletChainId);
     }
-  }, [chainId, chains]);
+  }, [chainId, walletChainId]);
 
   const handleSwitch = () => {
     switchChain({ chainId: chains[0].id });
@@ -20,18 +32,17 @@ export default function SwitchToValidChain() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      
       <DialogContent>
         <DialogHeader>
           <DialogTitle>hello</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4">
-          <div>请切换到目标链（ID: {chains[0]?.id}）以继续操作。</div>
+          <div>Please switch to （ID: {chains[0]?.id} to proceed.</div>
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded"
             onClick={handleSwitch}
           >
-            一键切换
+            Switch
           </button>
         </div>
       </DialogContent>
