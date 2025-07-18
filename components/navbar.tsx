@@ -89,7 +89,7 @@ export function Navbar() {
                     <WalletIcon className="w-4 h-4" />
                     <span>{formatAddress(address)}</span>
                   </Button> */}
-                  <ConnectButton />
+                  <ConnectButton chainStatus={{smallScreen: 'icon', largeScreen: 'full'}} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="start">
                   <DropdownMenuGroup>
