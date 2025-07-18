@@ -89,7 +89,7 @@ export function Navbar() {
                     <WalletIcon className="w-4 h-4" />
                     <span>{formatAddress(address)}</span>
                   </Button> */}
-                  <ConnectButton label={'Connect Wallet'} />
+                  <ConnectButton />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="start">
                   <DropdownMenuGroup>

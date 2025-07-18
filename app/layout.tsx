@@ -43,7 +43,7 @@ export default function RootLayout({
       >
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>
-            <RainbowKitProvider>
+            <RainbowKitProvider locale="en" theme={darkTheme()}>
               <LoadingProvider>
                 <ContractProvider>
                   {/* 如果是不支持的链，需要引导用户切换到支持的链 */}
